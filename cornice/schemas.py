@@ -3,8 +3,12 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 import webob.multidict
 
+from pyramid.i18n import TranslationStringFactory
 from pyramid.path import DottedNameResolver
 from cornice.util import to_list, extract_request_data
+
+
+_ = TranslationStringFactory('cornice')
 
 
 class SchemaError(Exception):
@@ -128,8 +132,11 @@ def validate_colander_schema(schema, request):
             if attr.required and attr.name not in data and \
                attr.default == null:
                 # missing
-                request.errors.add(location, attr.name,
-                                   "%s is missing" % attr.name)
+                request.errors.add(
+                    location, attr.name,
+                    _('%s is missing',
+                      default='${name} is missing',
+                      mapping={'name': attr.name}))
             else:
                 try:
                     if attr.name not in data:

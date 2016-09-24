@@ -415,3 +415,19 @@ if COLANDER:
                 "optional": "true"
             })
             self.assertEqual(len(dummy_request.errors), 0)
+
+        def test_localize_is_missing(self):
+            class MySchema(MappingSchema):
+                foo = SchemaNode(String(), type='str')
+
+            dummy_request = get_mock_request(json.dumps({}))
+            validate_colander_schema(
+                CorniceSchema.from_colander(MySchema),
+                dummy_request)
+
+            self.assertEqual(len(dummy_request.errors), 1)
+            self.assertDictEqual(dummy_request.errors[0], {
+                'location': 'body',
+                'description': 'foo is missing',
+                'name': 'foo',
+            })
